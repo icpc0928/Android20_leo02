@@ -1,7 +1,9 @@
 package tw.org.iii.leo.leo02;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -15,6 +17,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText input;
     private TextView log;
     private String answer;
+    private AlertDialog alertDialog = null;
 
 
 
@@ -23,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.v("leo","onCreate()");
+
+
 
         guess = findViewById(R.id.guess);
         input = findViewById(R.id.input);
@@ -38,6 +43,25 @@ public class MainActivity extends AppCompatActivity {
         initNewGame();
     }
 
+    private void showDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//      Activity and Server   is a Context
+        builder.setTitle("WINNER");
+        builder.setMessage("U WIN");
+        builder.setCancelable(false); //這個是不能取消
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                initNewGame();
+            }
+        });
+
+        alertDialog = builder.create();
+        alertDialog.show();
+
+
+    }
+
     private void guess(){
         String strInput = input.getText().toString();
 //        log.setText(strInput);
@@ -46,6 +70,9 @@ public class MainActivity extends AppCompatActivity {
         log.append(strInput + " => "+ result + "\n");
         input.setText("");
 
+        if(result.equals("3A0B")){
+            showDialog();
+        }
     }
 
 
@@ -54,6 +81,8 @@ public class MainActivity extends AppCompatActivity {
         answer = createAnswer(3);
         input.setText("");
         log.setText("");
+
+        Log.v("leo","answer" +answer);
     }
 
     private String createAnswer(int d){
