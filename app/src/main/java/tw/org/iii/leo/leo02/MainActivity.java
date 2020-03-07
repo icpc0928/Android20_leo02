@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     private Button guess;
@@ -18,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView log;
     private String answer;
     private AlertDialog alertDialog = null;
+    private int counter;
 
 
 
@@ -40,19 +42,19 @@ public class MainActivity extends AppCompatActivity {
                 guess();
             }
         });
-        initNewGame();
+        initNewGame(null);
     }
 
-    private void showDialog(){
+    private void showDialog(boolean isWinner, String mesg){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //      Activity and Server   is a Context
-        builder.setTitle("WINNER");
-        builder.setMessage("U WIN");
+        builder.setTitle(isWinner?"WINNER":"LOSER");
+        builder.setMessage(mesg);
         builder.setCancelable(false); //這個是不能取消
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                initNewGame();
+                initNewGame(null);
             }
         });
 
@@ -64,24 +66,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void guess(){
+        counter++;
         String strInput = input.getText().toString();
 //        log.setText(strInput);
 //        log.append(strInput + "\n");
         String result = checkAB(strInput);
-        log.append(strInput + " => "+ result + "\n");
+        log.append(counter + ". "+strInput + " => "+ result + "\n");
         input.setText("");
 
-        if(result.equals("3A0B")){
-            showDialog();
+        if(result.equals(guessDig + "A0B")){
+            showDialog(true,"WINNER");
+        }else if ( counter == 10){
+            showDialog(false,"ANS is "+ answer);
         }
     }
 
 
 
-    private void initNewGame(){
-        answer = createAnswer(3);
+    public void initNewGame(View view){
+        answer = createAnswer(guessDig);
         input.setText("");
         log.setText("");
+        counter = 0;
 
         Log.v("leo","answer" +answer);
     }
@@ -157,6 +163,109 @@ public class MainActivity extends AppCompatActivity {
         super.onRestart();
         Log.v("leo","onRestart()");
     }
+
+
+    public void exit(View view) {
+        finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Log.v("leo","onBackPressed");
+    }
+
+
+    private long lastTime = 0;
+
+    @Override
+    public void finish() {
+        //super.finish();
+        Log.v("leo","finish()");
+
+
+        if(System.currentTimeMillis() - lastTime <= 3* 1000){
+            super.finish();
+        }else{
+            Toast.makeText(this,"press again to exit",Toast.LENGTH_SHORT).show();
+        }
+        lastTime = System.currentTimeMillis();
+
+
+    }
+
+    public void setting(View view) {
+        showDialog3();
+    }
+
+    private void showDialog1(){
+       new AlertDialog.Builder(this)
+               .setTitle("INFO")
+               .setMessage("hello")
+               .setCancelable(false)
+               .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                   @Override
+                   public void onClick(DialogInterface dialog, int which) {
+
+                   }
+               })
+               .setNegativeButton("Cancel",null)
+               .create()
+               .show();
+    }
+
+
+
+    private int guessDig = 3;
+    //猜幾碼 預設三碼
+    private int tempDig = 0;
+
+
+
+
+
+    private void showDialog2(){
+        String[] items = {"Item1","Item2","Item3","Item4"};
+        new AlertDialog.Builder(this)
+                .setTitle("INFO")
+
+                .setCancelable(false)
+                .setItems(items,new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.v("leo","=> "+ which);
+                    }
+                })
+
+                .create()
+                .show();
+    }
+
+    private void showDialog3(){
+        String[] items = {"3","4","5","6"};
+        new AlertDialog.Builder(this)
+                .setTitle("猜幾碼")
+                .setCancelable(false)
+                .setSingleChoiceItems(items, guessDig-3, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.v("leo","=> " + which);
+                        tempDig = which + 3; //這個which只是這裡的區域變數、我要努力把它存起來放到下面的ok內取得
+                    }
+                })
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.v("leo","OK");
+                        guessDig = tempDig;
+                        initNewGame(null);
+                    }
+                })
+                .setNegativeButton("Cancel",null)
+                .create()
+                .show();
+    }
+
 
 
 }
