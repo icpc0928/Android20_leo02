@@ -22,6 +22,9 @@
             android:layout_alignParentRight="true"
             android:text="Guess"
 
+
+
+
             />
         <EditText
             android:id="@+id/input"
@@ -31,6 +34,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignTop="@id/guess"
             android:layout_alignBottom="@id/guess"
+            android:inputType="numberDecimal"
             >
 
         </EditText>
@@ -83,7 +87,6 @@
         android:id="@+id/log"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="123 = > 1A1B"
         android:textSize="24sp"
         android:background="#eae"
         android:layout_below="@id/topLine"
